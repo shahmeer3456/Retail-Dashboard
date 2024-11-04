@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Login</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+    <link rel="stylesheet" href="plugins/fontawesome-free/css/all.min.css">
+    <link rel="stylesheet" href="plugins/icheck-bootstrap/icheck-bootstrap.min.css">
+    <link rel="stylesheet" href="dist/css/adminlte.min.css">
+    <style>
+        .spinner-border {
+            width: 1.25rem;
+            height: 1.25rem;
+            display: none;
+        }
+    </style>
+</head>
+<body class="hold-transition login-page">
+    <div class="login-box">
+        <div class="card card-outline card-primary">
+            <div class="card-header text-center">
+                <a class="h1"><b>Retailer</b>Login</a>
+            </div>
+            <div class="card-body">
+                <p class="login-box-msg">Sign in to start your session</p>
+                <form id="loginForm">
+                    <div class="input-group mb-3">
+                        <input type="email" id="email" class="form-control" placeholder="Email" aria-label="Email" required>
+                        <div class="input-group-append">
+                            <div class="input-group-text"><span class="fas fa-envelope"></span></div>
+                        </div>
+                        <div class="invalid-feedback" id="emailError">Please enter a valid email.</div>
+                    </div>
+                    <div class="input-group mb-3">
+                        <input type="password" id="password" class="form-control" placeholder="Password" aria-label="Password" required>
+                        <div class="input-group-append">
+                            <div class="input-group-text"><span class="fas fa-lock"></span></div>
+                        </div>
+                        <div class="invalid-feedback" id="passwordError">Please enter your password.</div>
+                    </div>
+                    <div class="row">
+                        <div class="col-8">
+                            <div class="icheck-primary">
+                                <input type="checkbox" id="remember">
+                                <label for="remember">Remember Me</label>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <button type="submit" class="btn btn-primary btn-block">
+                                Sign In
+                                <div class="spinner-border spinner-border-sm text-light" role="status" id="loadingSpinner"></div>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+                <p class="mb-1"><a href="#" id="forgotPasswordLink">I forgot my password</a></p>
+                <p class="mb-0"><a href="signup.html" class="text-center">Register a new membership</a></p>
+            </div>
+        </div>
+    </div>
+    <script src="plugins/jquery/jquery.min.js"></script>
+    <script src="plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="dist/js/adminlte.min.js"></script>
+    <script>
+        $('#loginForm').submit(function (e) {
+            e.preventDefault();
+            $('#emailError').hide();
+            $('#passwordError').hide();
+            var email = $('#email').val();
+            var password = $('#password').val();
+            
+            if (!email) {
+                $('#emailError').show();
+                return;
+            }
+            if (!password) {
+                $('#passwordError').show();
+                return;
+            }
+
+            $('#loadingSpinner').show();
+            
+            $.ajax({
+                url: 'http://localhost:4000/login',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ email: email, password: password }),
+                success: function (response) {
+                    $('#loadingSpinner').hide();
+                    if (response.success) {
+                        window.location.href = "dashboard.html";
+                    } else {
+                        $('#passwordError').text(response.message).show();
+                    }
+                },
+                error: function (error) {
+                    $('#loadingSpinner').hide();
+                    $('#passwordError').text('Error during login: ' + (error.responseJSON.message || 'Unknown error')).show();
+                },
+            });
+        });
+
+        $('#forgotPasswordLink').click(function () {
+            var email = prompt('Please enter your email for password reset:');
+            if (email) {
+                $.ajax({
+                    url: 'http://localhost:4000/forgot-password',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ email: email }),
+                    success: function (response) {
+                        alert(response.message);
+                    },
+                    error: function (error) {
+                        alert('Error requesting password reset: ' + (error.responseJSON.message || 'Unknown error'));
+                    },
+                });
+            }
+        });
+    </script>
+</body>
+</html>

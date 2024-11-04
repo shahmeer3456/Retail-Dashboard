@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customers</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+    <link rel="stylesheet" href="plugins/fontawesome-free/css/all.min.css">
+    <link rel="stylesheet" href="dist/css/adminlte.min.css">
+</head>
+<body class="hold-transition sidebar-mini">
+<div class="wrapper">
+    <!-- Navbar and Sidebar -->
+    <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+        <ul class="navbar-nav">
+            <li class="nav-item">
+                <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+            </li>
+            <li class="nav-item d-none d-sm-inline-block">
+                <a href="dashboard.html" class="nav-link">Home</a>
+            </li>
+        </ul>
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="logout.html" role="button"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </li>
+        </ul>
+    </nav>
+    <aside class="main-sidebar sidebar-dark-primary elevation-4">
+        <a href="dashboard.html" class="brand-link">
+            <img src="dist/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+            <span class="brand-text font-weight-light">Retail Dashboard</span>
+        </a>
+        <div class="sidebar">
+            <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+                <div class="image">
+                    <img src="dist/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image">
+                </div>
+                <div class="info">
+                    <a href="#" class="d-block">Admin</a>
+                </div>
+            </div>
+            <nav class="mt-2">
+                <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+                    <li class="nav-item"><a href="dashboard.html" class="nav-link"><i class="nav-icon fas fa-tachometer-alt"></i><p>Dashboard</p></a></li>
+                    <li class="nav-item"><a href="customers.html" class="nav-link"><i class="nav-icon fas fa-users"></i><p>Customers</p></a></li>
+                    <li class="nav-item"><a href="products.html" class="nav-link"><i class="nav-icon fas fa-box"></i><p>Products</p></a></li>
+                    <li class="nav-item"><a href="sales.html" class="nav-link"><i class="nav-icon fas fa-shopping-cart"></i><p>Sales</p></a></li>
+                    <li class="nav-item"><a href="reports.html" class="nav-link"><i class="nav-icon fas fa-chart-line"></i><p>Reports</p></a></li>
+                </ul>
+            </nav>
+        </div>
+    </aside>
+
+    <div class="content-wrapper">
+        <div class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1 class="m-0">Customers</h1>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="content">
+            <div class="container-fluid">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Contact</th> <!-- New Contact Column -->
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="customersTable">
+                        <!-- Customers will be populated here -->
+                    </tbody>
+                </table>
+                <button class="btn btn-primary" data-toggle="modal" data-target="#addCustomerModal">Add Customer</button>
+
+                <!-- Add/Edit Customer Modal -->
+                <div class="modal fade" id="addCustomerModal" tabindex="-1" role="dialog">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Add/Edit Customer</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="addCustomerForm">
+                                    <input type="hidden" id="customerId">
+                                    <div class="form-group">
+                                        <label for="customerName">Name</label>
+                                        <input type="text" class="form-control" id="customerName" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="customerEmail">Email</label>
+                                        <input type="email" class="form-control" id="customerEmail" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="customerContact">Contact</label> <!-- Corrected ID -->
+                                        <input type="number" class="form-control" id="customerContact" required> <!-- Corrected ID -->
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Save Customer</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="main-footer">
+        <strong>&copy; 2024 <a href="#">SAM and Co</a>.</strong> All rights reserved.
+    </footer>
+</div>
+
+<script src="plugins/jquery/jquery.min.js"></script>
+<script src="plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="dist/js/adminlte.min.js"></script>
+<script>
+    $(document).ready(function() {
+        loadCustomers();
+
+        $('#addCustomerForm').on('submit', function(e) {
+            e.preventDefault();
+            const id = $('#customerId').val();
+            const name = $('#customerName').val();
+            const email = $('#customerEmail').val();
+            const contact_number = $("#customerContact").val(); // Updated ID
+            
+            // Determine if adding a new customer or updating an existing one
+            const url = id ? `http://localhost:4000/customers/${id}` : 'http://localhost:4000/customers';
+            const method = id ? 'PUT' : 'POST';
+
+            $.ajax({
+                url: url,
+                type: method,
+                contentType: 'application/json',
+                data: JSON.stringify({ name, email, contact_number }), // Updated to include contact number
+                success: function(response) {
+                    alert(response.message);
+                    $('#addCustomerModal').modal('hide');
+                    $('#addCustomerForm')[0].reset();
+                    loadCustomers();
+                },
+                error: function() {
+                    alert('An error occurred. Please try again.');
+                }
+            });
+        });
+    });
+
+    function loadCustomers() {
+        $.ajax({
+            url: 'http://localhost:4000/customers',
+            type: 'GET',
+            success: function(data) {
+                const customersTable = $('#customersTable');
+                customersTable.empty();
+                data.forEach(customer => {
+                    customersTable.append(`<tr>
+                        <td>${customer.id}</td>
+                        <td>${customer.name}</td>
+                        <td>${customer.email}</td>
+                        <td>${customer.contact_number}</td> <!-- Updated to include contact number -->
+                        <td>
+                            <button class="btn btn-info" onclick="editCustomer(${customer.id}, '${customer.name}', '${customer.email}', '${customer.contact_number}')">Edit</button>
+                            <button class="btn btn-danger" onclick="deleteCustomer(${customer.id})">Delete</button>
+                        </td>
+                    </tr>`);
+                });
+            },
+            error: function() {
+                alert('An error occurred while loading customers.');
+            }
+        });
+    }
+
+    function editCustomer(id, name, email, contact_number) { // Added contact_number parameter
+        $('#customerId').val(id);
+        $('#customerName').val(name);
+        $('#customerEmail').val(email);
+        $('#customerContact').val(contact_number); // Set the contact number in the modal
+        $('#addCustomerModal').modal('show');
+    }
+
+    function deleteCustomer(id) {
+        if (confirm('Are you sure you want to delete this customer?')) {
+            $.ajax({
+                url: `http://localhost:4000/customers/${id}`,
+                type: 'DELETE',
+                success: function(response) {
+                    alert(response.message);
+                    loadCustomers();
+                },
+                error: function() {
+                    alert('An error occurred while deleting the customer.');
+                }
+            });
+        }
+    }
+</script>
+</body>
+</html>
