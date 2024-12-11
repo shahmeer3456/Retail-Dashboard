@@ -38,7 +38,7 @@ Ensure you have the following installed:
 #### Step 1: Clone the Repository
 
 ```bash
-git clone https://github.com/yourusername/retail-store-management.git
+https://github.com/shahmeer3456/Retail-Dashboard.git
 cd retail-store-management
 ```
 
